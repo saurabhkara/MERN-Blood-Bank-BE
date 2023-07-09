@@ -1,6 +1,7 @@
 import express from "express";
 import testRouter from "./routes/testRoutes.js";
 import authRouter from "./routes/authRoutes.js";
+import inventoryRouter from "./routes/inventoryRoutes.js";
 import dotenv from "dotenv";
 import colors from "colors";
 import cors from "cors";
@@ -27,6 +28,7 @@ app.use(express.json());
 app.use(morgan("dev"));
 app.use("/api/v1", testRouter);
 app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/inventory", inventoryRouter);
 
 //Port
 const PORT = process.env.PORT || 5000;

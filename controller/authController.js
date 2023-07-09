@@ -39,10 +39,15 @@ export const registerController = async (req, res) => {
 export const loginController = async (req, res) => {
   try {
     const user = await UsersModel.find({ email: req.body.email });
-    if (!!!user) {
+    if (!user) {
       return res.status(404).send({
         success: false,
         message: "Invalid credentials",
+      });
+    } else if (user.role !== req.body.role) {
+      return res.status(500).send({
+        success: false,
+        message: "Role does not matched",
       });
     } else {
       const comparePassoword = await bcrypt.compare(
@@ -50,9 +55,13 @@ export const loginController = async (req, res) => {
         user[0].password
       );
       if (comparePassoword) {
-        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-          expiresIn: "1d",
-        });
+        const token = jwt.sign(
+          { userId: user[0]._id },
+          process.env.JWT_SECRET,
+          {
+            expiresIn: "1d",
+          }
+        );
         return res.status(200).send({
           success: true,
           message: "Login Successfull",
@@ -72,6 +81,23 @@ export const loginController = async (req, res) => {
       success: false,
       message: "Error in Login Api",
       error,
+    });
+  }
+};
+
+export const getCurrentUserController = async (req, res) => {
+  try {
+    const user = await UsersModel.findOne({ _id: req.body.userId });
+    return res.status(200).send({
+      success: true,
+      message: "User fetched successfuly",
+      user,
+    });
+  } catch (error) {
+    console.log("Error in Current user controller", error);
+    return res.status(500).send({
+      success: false,
+      message: "Unable to get current user",
     });
   }
 };
